@@ -24,7 +24,6 @@
   "dependencies": {
     "browserify": "^13.0",
     "gulp-util": "^3.0",
-    "stringify": "^5.1",
     "underscore": "^1.8",
     "vinyl-buffer": "^1.0",
     "vinyl-source-stream": "^1.1",
