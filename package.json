@@ -1,5 +1,5 @@
 {
-  "version": "rc1.0.0",
+  "version": "1.0.0",
   "name": "gulp-assembly-browserify",
   "description": "Browserify component for gulp assembly package.",
   "keywords": [
