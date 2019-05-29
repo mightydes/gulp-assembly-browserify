@@ -12,9 +12,6 @@ function Browserify(options) {
         return new Browserify(options);
     }
 
-    if (!_.has(options, 'entries')) {
-        throw new Error(`[gulp-assembly-browserify] Missed mandatory 'options.entries'!`);
-    }
     if (!_.has(options, 'output')) {
         throw new Error(`[gulp-assembly-browserify] Missed mandatory 'options.output'!`);
     }
@@ -22,8 +19,14 @@ function Browserify(options) {
         options.browserify = {};
     }
 
-    let entries = _.isArray(options.entries) ? options.entries : [options.entries];
-    let stream = options.utils.isNoWatch() ? browserifyStream() : watchifyStream();
+    let isWatch = function () {
+        if (_.has(options, 'noWatch')) {
+            return !options.noWatch;
+        } else {
+            return !options.utils.isNoWatch();
+        }
+    };
+    let stream = isWatch() ? watchifyStream() : browserifyStream();
 
     bundle(stream);
     return stream;
@@ -32,11 +35,21 @@ function Browserify(options) {
     // FUNCTIONS:
 
     function browserifyStream() {
-        let opt = Object.assign({entries: entries}, options.browserify);
-        options.utils.isNoWatch() || (opt = Object.assign(opt, watchify.args));
-        if (options.transformHandler) {
-            return options.transformHandler(browserify(opt));
+        let opt = {};
+        if (_.has(options, 'entries')) {
+            let entries = _.isArray(options.entries) ? options.entries : [options.entries];
+            opt = {entries: entries};
         }
+        opt = Object.assign(opt, options.browserify);
+
+        if (isWatch()) {
+            opt = Object.assign(opt, watchify.args);
+        }
+
+        if (options.beforeBundle) {
+            return options.beforeBundle(browserify(opt));
+        }
+
         return browserify(opt);
     }
 
@@ -54,8 +67,8 @@ function Browserify(options) {
             .on('error', $util.log.bind($util, '[gulp-assembly-browserify] Bundle error occurred!'))
             .pipe(source(options.output))
             .pipe(buffer());
-        if (options.bundleHandler) {
-            out = options.bundleHandler(out);
+        if (options.afterBundle) {
+            out = options.afterBundle(out);
         }
         return out.pipe(options.utils.dest());
     }

@@ -5,7 +5,7 @@ Browserify component for gulp assembly package.
 
 ## Option list:
 
-*   `entries` -- mandatory input file(s). Can be string or array.
+*   `entries` -- optional input file(s). Can be string or array.
     For example: `require.resolve('./mount/website')`.
 
 *   `output` -- mandatory output filename.
@@ -15,28 +15,30 @@ Browserify component for gulp assembly package.
 
 *   `browserify` -- optional browserify config object.
 
-*   `transformHandler` -- optional function to apply browserify transforms.
+*   `beforeBundle` -- optional function to apply browserify transforms.
     For example:
 
     ```
     {
-        transformHandler: function(stream) {
-            return stream
+        beforeBundle: function(bundle) {
+            return bundle
                 .transform(stringify, stringifyOpt);
         }
     }
     ```
 
-*   `bundleHandler` -- optional function to pipe plugins.
+*   `afterBundle` -- optional function to pipe plugins.
     For example:
 
     ```
     {
-        bundleHandler: function(stream) {
-            return stream
+        afterBundle: function(bundle) {
+            return bundle
                 .pipe($.if(isWrap, $.wrap(wrapOpt)))
                 .pipe($.if(isTemplateData, $.template(templateDataOpt)))
                 .pipe(minifyJs());
         }
     }
     ```
+
+*   `noWatch` -- optional bool. By default defined by `utils.isNoWatch()` function...
